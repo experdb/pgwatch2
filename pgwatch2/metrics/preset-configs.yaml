@@ -98,6 +98,7 @@
     psutil_disk: 120
     psutil_disk_io_total: 120
     wal_receiver: 120
+    stat_activity_realtime: 10
 
 # the Docker image with Influx metric storage cannot handle more recommendations...
 - name: full_influx

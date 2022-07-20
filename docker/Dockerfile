@@ -13,6 +13,10 @@ RUN cd /pgwatch2 && bash build_gatherer.sh
 FROM ubuntu:16.04
 
 RUN apt-get -q update \
+    && apt install -qy software-properties-common \
+    && add-apt-repository -y ppa:fkrull/deadsnakes \
+    && apt-get -q update \
+    && apt-get install -y python3.6 && unlink /usr/bin/python3 && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 0 \
     && apt-get -qy install wget apt-transport-https vim git postgresql postgresql-plpython3-9.5 postgresql-plpython-9.5 libfontconfig python3-pip python-pip libssl-dev libpq-dev libffi-dev \
     && pip install -U "pip < 21.0" && pip3 install -U "pip < 21.0" \
     && locale-gen "en_US.UTF-8" && apt autoremove -y \
@@ -25,7 +29,8 @@ RUN apt-get -q update \
 # Influxdb [https://portal.influxdata.com/downloads]
 #   latest ver.: curl -so- https://api.github.com/repos/influxdata/influxdb/tags | grep -Eo '"v[0-9\.]+"' | grep -Eo '[0-9\.]+' | sort -nr | head -1
 
-RUN wget -q -O grafana.deb https://dl.grafana.com/oss/release/grafana_6.7.6_amd64.deb \
+#RUN wget -q -O grafana.deb https://dl.grafana.com/oss/release/grafana_6.7.6_amd64.deb \
+RUN wget -q -O grafana.deb https://dl.grafana.com/oss/release/grafana_8.5.6_amd64.deb \
     && wget -q -O - https://dl.influxdata.com/influxdb/releases/influxdb_1.8.5_amd64.deb > influxdb_amd64.deb \
     && dpkg -i grafana.deb && rm grafana.deb \
     && dpkg -i influxdb_amd64.deb && rm influxdb_amd64.deb \
@@ -43,6 +48,7 @@ RUN wget -q -O grafana.deb https://dl.grafana.com/oss/release/grafana_6.7.6_amd6
 # Add pgwatch2 sources
 ADD pgwatch2 /pgwatch2
 # Copy over the compiled gatherer
+#COPY --from=0 /pgwatch2/experdbc /pgwatch2
 COPY --from=0 /pgwatch2/pgwatch2 /pgwatch2
 ADD webpy /pgwatch2/webpy
 

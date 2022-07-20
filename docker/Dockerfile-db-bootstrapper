@@ -27,7 +27,8 @@ ENV BOOTSTRAP_ADD_TEST_MONITORING_ENTRY 1
 # chema owner role created if not existing
 ENV BOOTSTRAP_SCHEMA_OWNER pgwatch2
 # metric-time | metric-dbname-time | timescale
-ENV BOOTSTRAP_METRICSDB_SCHEMA_TYPE metric-time
+#ENV BOOTSTRAP_METRICSDB_SCHEMA_TYPE metric-time
+ENV BOOTSTRAP_METRICSDB_SCHEMA_TYPE timescale
 
 ## Optional
 # TODO create a read-only user to help with Grafana integration

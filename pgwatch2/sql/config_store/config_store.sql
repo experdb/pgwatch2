@@ -66,6 +66,12 @@ alter table pgwatch2.monitored_db add constraint preset_or_custom_config check
     add constraint preset_or_custom_config_standby check (
     not (md_preset_config_name_standby is not null and md_config_standby is not null));
 
+-- @@ monitored_server
+create table if not exists pgwatch2.monitored_server (
+    ms_hostname text not null primary key,
+    ms_hagroup_id int not null,
+    ms_upstream_hostname text
+);
 
 create table if not exists metric (
     m_id                serial primary key,

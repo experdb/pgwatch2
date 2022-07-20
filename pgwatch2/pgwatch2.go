@@ -918,6 +918,7 @@ func GetMonitoredDatabasesFromConfigDB() ([]MonitoredDatabase, error) {
 	return monitoredDBs, err
 }
 
+// @@@
 func SendToInflux(connect_str, conn_id string, storeMessages []MetricStoreMessage) error {
 	if len(storeMessages) == 0 {
 		return nil
@@ -980,6 +981,27 @@ retry:
 				}
 			}
 
+			// @@@
+			// var dbInfoTag []string = []string{"md_id", "cluster_id", "ha_group_id", "upstream_id"}
+
+			// if msg.CustomTags != nil {
+			// 	if msg.MetricName == MONITORED_DBS_DATASTORE_SYNC_METRIC_NAME {
+			// 		for k, v := range msg.CustomTags {
+			// 			tags[k] = fmt.Sprintf("%v", v)
+			// 		}
+
+			// 	} else {
+			// 		for k, v := range msg.CustomTags {
+			// 			if contains(dbInfoTag, k) {
+			// 				continue
+			// 			}
+			// 			tags[k] = fmt.Sprintf("%v", v)
+			// 		}
+
+			// 	}
+
+			// }
+
 			for k, v := range dr {
 				if v == nil || v == "" {
 					continue // not storing NULLs
@@ -1035,6 +1057,16 @@ retry:
 	}
 	return err
 }
+
+// @@@
+// func contains(dbInfoTag []string, v string) bool {
+// 	for _, s := range dbInfoTag {
+// 		if v == s {
+// 			return true
+// 		}
+// 	}
+// 	return false
+// }
 
 func SendToPostgres(storeMessages []MetricStoreMessage) error {
 	if len(storeMessages) == 0 {

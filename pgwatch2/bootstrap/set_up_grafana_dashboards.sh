@@ -37,14 +37,14 @@ if [ "$GRAFANA_MAJOR_VER" -gt 4 ] ; then
 
 GUID=$(echo "$JSON" | md5sum | egrep -o "^.{9}")
 SQL='insert into dashboard (version, org_id, created, updated, updated_by, created_by, gnet_id, slug, title, data, uid) values (0, 1, now(), now(), 1, 1, 0'
-for d in "$slug" "$TITLE" "$JSON" "$GUID" ; do
+for d in "$slug" "$TITLE" "$JSON" "$slug" ; do
   SQL+=",\$SQL\$${d}\$SQL\$"
 done
 
 else
 
 SQL='insert into dashboard (version, org_id, created, updated, updated_by, created_by, gnet_id, slug, title, data) values (0, 1, now(), now(), 1, 1, 0'
-for d in "$slug" "$TITLE" "$JSON" ; do
+for d in "$slug" "$TITLE" "$slug" ; do
 SQL+=",\$SQL\$${d}\$SQL\$"
 done
 
@@ -56,11 +56,18 @@ echo "$SQL" | psql -h /var/run/postgresql pgwatch2_grafana
 
 done
 
-psql -h /var/run/postgresql -d pgwatch2_grafana -c "insert into public.dashboard_tag(dashboard_id, term) select id, 'pgwatch2' from public.dashboard on conflict do nothing"
+# tag -> experdb
+psql -h /var/run/postgresql -d pgwatch2_grafana -c "insert into public.dashboard_tag(dashboard_id, term) select id, 'experdb' from public.dashboard on conflict do nothing"
 
-HEALTHCHECK_STAR="INSERT INTO star (user_id, dashboard_id) SELECT 1, id FROM dashboard WHERE slug = 'health-check'"
-psql -h /var/run/postgresql -c "$HEALTHCHECK_STAR" pgwatch2_grafana
-HOME_DASH="INSERT INTO preferences (org_id, user_id, version, home_dashboard_id, timezone, theme, created, updated, team_id) SELECT 1, 0, 0, id, '', '', now(), now(), 0 FROM dashboard WHERE slug = 'health-check'"
+# set stars -> experdb-global-overview, experdb-overview
+EXPERDBOVERVIEW_STAR="INSERT INTO star (user_id, dashboard_id) SELECT 1, id FROM dashboard WHERE slug = 'experdb-overview'"
+psql -h /var/run/postgresql -c "$EXPERDBOVERVIEW_STAR" pgwatch2_grafana
+
+GLOBALEXPERDBOVERVIEW_STAR="INSERT INTO star (user_id, dashboard_id) SELECT 1, id FROM dashboard WHERE slug = 'experdb-global-overview'"
+psql -h /var/run/postgresql -c "$GLOBALEXPERDBOVERVIEW_STAR" pgwatch2_grafana
+
+# set home dashboard -> experdb-global-overview
+HOME_DASH="INSERT INTO preferences (org_id, user_id, version, home_dashboard_id, timezone, theme, created, updated, team_id) SELECT 1, 0, 0, id, '', '', now(), now(), 0 FROM dashboard WHERE slug = 'experdb-global-overview'"
 psql -h /var/run/postgresql -c "$HOME_DASH" pgwatch2_grafana
 
 exit 0

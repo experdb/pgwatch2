@@ -17,6 +17,7 @@ if [ -n "$GIT_TIME" -a -n "$GIT_HASH" ] ; then
 elif [ -f build_git_version.txt ] ; then
     # Dockerfile build fills the file with HEAD hash
     echo "running (2): go build -ldflags \"-X main.commit=`cat build_git_version.txt`\" pgwatch2.go prom.go patroni.go logparse.go"
+#    go build -ldflags "-X main.commit=`cat build_git_version.txt`" pgwatch2.go prom.go patroni.go logparse.go
     go build -ldflags "-X main.commit=`cat build_git_version.txt`" pgwatch2.go prom.go patroni.go logparse.go
 else
 

@@ -23,7 +23,7 @@ services:
       PGHOST: postgres
       BOOTSTRAP_TYPE: metricsdb
       BOOTSTRAP_DATABASE: pgwatch2_metrics
-      BOOTSTRAP_METRICSDB_SCHEMA_TYPE: metric-time
+      BOOTSTRAP_METRICSDB_SCHEMA_TYPE: timescale
     depends_on:
       - postgres
   webui:

@@ -6573,7 +6573,7 @@ WHERE
   AND now() - query_start > '500ms'::interval
 ORDER BY
   now() - query_start DESC
-LIMIT 25;
+LIMIT 30;
 $sql$,
 '{"prometheus_all_gauge_columns": true}'
 );

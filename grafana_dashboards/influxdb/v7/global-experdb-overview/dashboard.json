@@ -1,0 +1,1428 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "target": {
+          "limit": 100,
+          "matchAny": false,
+          "tags": [],
+          "type": "dashboard"
+        },
+        "type": "dashboard"
+      }
+    ]
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 2,
+  "id": 38,
+  "links": [],
+  "liveNow": true,
+  "panels": [
+    {
+      "datasource": {
+        "type": "postgres",
+        "uid": "AM_Xqll7z"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "align": "left",
+            "displayMode": "color-text",
+            "filterable": false,
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "level"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "options": {
+                      "0": {
+                        "color": "blue",
+                        "index": 0,
+                        "text": "P"
+                      },
+                      "1": {
+                        "color": "yellow",
+                        "index": 2,
+                        "text": "└ S"
+                      }
+                    },
+                    "type": "value"
+                  },
+                  {
+                    "options": {
+                      "from": 2,
+                      "result": {
+                        "color": "yellow",
+                        "index": 1,
+                        "text": "　└ S"
+                      },
+                      "to": 100
+                    },
+                    "type": "range"
+                  }
+                ]
+              },
+              {
+                "id": "custom.width",
+                "value": 20
+              },
+              {
+                "id": "displayName",
+                "value": "HA"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "md_unique_name"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 180
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "DB Overview",
+                    "url": "/d/dboverviews/dboverview?var-dbname=${__value.text}﻿﻿﻿&var-agg_interval=1s&from=$__from&to=$__to"
+                  }
+                ]
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-green",
+                  "mode": "fixed"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "DB Name"
+              },
+              {
+                "id": "custom.hidden",
+                "value": true
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "md_hostname"
+            },
+            "properties": [
+              {
+                "id": "custom.hidden",
+                "value": false
+              },
+              {
+                "id": "displayName",
+                "value": "IP"
+              },
+              {
+                "id": "custom.width",
+                "value": 120
+              },
+              {
+                "id": "links",
+                "value": [
+                  {
+                    "targetBlank": true,
+                    "title": "Detail Information",
+                    "url": "/d/dboverviews/dboverview?var-hostname=${__value.text}﻿﻿﻿&var-agg_interval=1s&from=$__from&to=$__to"
+                  }
+                ]
+              },
+              {
+                "id": "custom.displayMode",
+                "value": "color-text"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 26,
+        "w": 3,
+        "x": 0,
+        "y": 0
+      },
+      "id": 2,
+      "links": [],
+      "options": {
+        "footer": {
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "AM_Xqll7z"
+          },
+          "format": "table",
+          "group": [],
+          "hide": true,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "SELECT md_hadepth as \"HA\" , md_unique_name as \"Name\", md_hostname as \"IP\" FROM monitored_db ORDER BY md_hagroup, md_hadepth",
+          "refId": "A",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "AM_Xqll7z"
+          },
+          "format": "table",
+          "group": [],
+          "hide": false,
+          "metricColumn": "none",
+          "rawQuery": true,
+          "rawSql": "with recursive recur_data(md_hostname, md_unique_name, md_id, md_upid, md_hagroup, level, path, cycle) as\r\n(\r\n\tselect \r\n\t\tmdb.md_hostname \r\n\t  , mdb.md_unique_name \r\n\t  , mdb.md_id \r\n\t  , mdb.md_upid \r\n\t  , mdb.md_hagroup \r\n\t  , 0\r\n\t  , array[mdb.md_id]\r\n\t  , false \r\n\tfrom pgwatch2.monitored_db mdb\r\n\twhere mdb.md_upid is null \r\n\tunion all \r\n\tselect \r\n\t\tmdb.md_hostname \r\n\t  , mdb.md_unique_name \r\n\t  , mdb.md_id \r\n\t  , mdb.md_upid \r\n\t  , mdb.md_hagroup \r\n\t  , level + 1\r\n\t  , path || rd.md_id\r\n\t  , mdb.md_id = any(path)\r\n\tfrom pgwatch2.monitored_db mdb, recur_data rd\r\n\twhere mdb.md_upid = rd.md_id \r\n)\r\nselect level, md_unique_name, md_hostname from recur_data order by path",
+          "refId": "B",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "column"
+              }
+            ]
+          ],
+          "timeColumn": "time",
+          "where": [
+            {
+              "name": "$__timeFilter",
+              "params": [],
+              "type": "macro"
+            }
+          ]
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "description": "Requires according \"metric fetching helpers\" on the monitored server",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 50,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": true,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "decimals": 1,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "load_5"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#BA43A9",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "avg_query_runtime"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "ms"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "hidden"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 11,
+        "x": 3,
+        "y": 0
+      },
+      "id": 6,
+      "interval": "5m",
+      "links": [],
+      "options": {
+        "legend": {
+          "calcs": [
+            "mean"
+          ],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "dsType": "influxdb",
+          "groupBy": [
+            {
+              "params": [
+                "$interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "none"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "cpu_load",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT mean(\"load_5min\") FROM \"cpu_load\" WHERE $timeFilter GROUP BY dbname, time($__interval) fill(none)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "load_5min"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "CPU load",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "continuous-GrYlRd"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "#EAB839",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 70
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 10,
+        "x": 14,
+        "y": 0
+      },
+      "id": 8,
+      "maxDataPoints": 100,
+      "options": {
+        "displayMode": "lcd",
+        "minVizHeight": 10,
+        "minVizWidth": 0,
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showUnfilled": true
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "$$hashKey": "object:1338",
+          "aggregation": "Last",
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "decimals": 2,
+          "displayAliasType": "Warning / Critical",
+          "displayType": "Regular",
+          "displayValueWithAlias": "Never",
+          "query": "SELECT mean(\"percent\") FROM \"psutil_mem\" WHERE  $timeFilter GROUP BY dbname, time($__interval) fill(none)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "units": "none",
+          "valueHandler": "Number Threshold"
+        }
+      ],
+      "title": "Memory Usage",
+      "type": "bargauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 70
+              },
+              {
+                "color": "red",
+                "value": 85
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 10,
+        "x": 3,
+        "y": 9
+      },
+      "id": 10,
+      "options": {
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "query": " select last(\"idle\")/max_connections * 100 from \"backends\" WHERE  $timeFilter GROUP BY dbname, time($__interval) fill(none)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Session Connection",
+      "type": "gauge"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 11,
+        "x": 13,
+        "y": 9
+      },
+      "id": 20,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "query": "SELECT mean(\"idle\") FROM backends where $timeFilter GROUP BY  dbname, time($__interval) fill(none)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Session Stats",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 9,
+        "w": 9,
+        "x": 3,
+        "y": 17
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "query": "SELECT mean(\"percent\") FROM \"psutil_disk\" WHERE $timeFilter GROUP BY time($__interval), dbname, \"path\" fill(none)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Disk Usage",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 12,
+        "x": 12,
+        "y": 17
+      },
+      "id": 13,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_deleted) + last(tup_inserted) + last(tup_updated) from db_stats WHERE  $timeFilter GROUP BY dbname, time($__interval) fill(none)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname LAST",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_inserted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname FIRST",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select first(tup_inserted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname delete",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_deleted) - first(tup_deleted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "E",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname insert",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_inserted) - first(tup_inserted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "F",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname LASTFIRST",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  last(tup_deleted) - first(tup_deleted) \n  + last(tup_inserted) - first(tup_inserted)\n  + last(tup_updated) - first(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(1)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "$$hashKey": "object:24",
+          "aggregation": "Last",
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "decimals": 2,
+          "displayAliasType": "Warning / Critical",
+          "displayType": "Regular",
+          "displayValueWithAlias": "Never",
+          "hide": false,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \n  + max(tup_inserted) - min(tup_inserted)\n  + max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "G",
+          "resultFormat": "time_series",
+          "units": "none",
+          "valueHandler": "Number Threshold"
+        }
+      ],
+      "title": "Disk I/O Total",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 12,
+        "y": 21
+      },
+      "id": 14,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "titleSize": 15
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "alias": "$tag_dbname Delete",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": false,
+          "query": "select \n  max(tup_inserted) - min(tup_inserted)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname Update",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname delete",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_deleted) - first(tup_deleted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "E",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname insert",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_inserted) - first(tup_inserted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "F",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname LASTFIRST",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  last(tup_deleted) - first(tup_deleted) \n  + last(tup_inserted) - first(tup_inserted)\n  + last(tup_updated) - first(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(1)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "$$hashKey": "object:24",
+          "aggregation": "Last",
+          "alias": "$tag_dbname MINMAX",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "decimals": 2,
+          "displayAliasType": "Warning / Critical",
+          "displayType": "Regular",
+          "displayValueWithAlias": "Never",
+          "hide": true,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \n  + max(tup_inserted) - min(tup_inserted)\n  + max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "G",
+          "resultFormat": "time_series",
+          "units": "none",
+          "valueHandler": "Number Threshold"
+        }
+      ],
+      "title": "Disk Insert",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 16,
+        "y": 21
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "titleSize": 15
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "alias": "$tag_dbname Delete",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname Insert",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  max(tup_inserted) - min(tup_inserted)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": false,
+          "query": "select \n  max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname delete",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_deleted) - first(tup_deleted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "E",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname insert",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_inserted) - first(tup_inserted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "F",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname LASTFIRST",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  last(tup_deleted) - first(tup_deleted) \n  + last(tup_inserted) - first(tup_inserted)\n  + last(tup_updated) - first(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(1)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "$$hashKey": "object:24",
+          "aggregation": "Last",
+          "alias": "$tag_dbname MINMAX",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "decimals": 2,
+          "displayAliasType": "Warning / Critical",
+          "displayType": "Regular",
+          "displayValueWithAlias": "Never",
+          "hide": true,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \n  + max(tup_inserted) - min(tup_inserted)\n  + max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "G",
+          "resultFormat": "time_series",
+          "units": "none",
+          "valueHandler": "Number Threshold"
+        }
+      ],
+      "title": "Disk Update",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "000000001"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 4,
+        "x": 20,
+        "y": 21
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "text": {
+          "titleSize": 15
+        },
+        "textMode": "auto"
+      },
+      "pluginVersion": "8.5.1",
+      "targets": [
+        {
+          "alias": "$tag_dbname",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": false,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname Insert",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  max(tup_inserted) - min(tup_inserted)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname Update",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname delete",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_deleted) - first(tup_deleted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "E",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname insert",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select last(tup_inserted) - first(tup_inserted) from db_stats WHERE  $timeFilter GROUP BY dbname fill(0)",
+          "rawQuery": true,
+          "refId": "F",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "alias": "$tag_dbname LASTFIRST",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "displayType": "Regular",
+          "hide": true,
+          "query": "select \n  last(tup_deleted) - first(tup_deleted) \n  + last(tup_inserted) - first(tup_inserted)\n  + last(tup_updated) - first(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(1)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "valueHandler": "Number Threshold"
+        },
+        {
+          "$$hashKey": "object:24",
+          "aggregation": "Last",
+          "alias": "$tag_dbname MINMAX",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "000000001"
+          },
+          "decimals": 2,
+          "displayAliasType": "Warning / Critical",
+          "displayType": "Regular",
+          "displayValueWithAlias": "Never",
+          "hide": true,
+          "query": "select \n  max(tup_deleted) - min(tup_deleted) \n  + max(tup_inserted) - min(tup_inserted)\n  + max(tup_updated) - min(tup_updated)\nfrom db_stats \nWHERE  $timeFilter \nGROUP BY dbname fill(0)\n",
+          "rawQuery": true,
+          "refId": "G",
+          "resultFormat": "time_series",
+          "units": "none",
+          "valueHandler": "Number Threshold"
+        }
+      ],
+      "title": "Disk Delete",
+      "type": "stat"
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 36,
+  "style": "dark",
+  "tags": [],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-6h",
+    "to": "now"
+  },
+  "timepicker": {
+    "hidden": false
+  },
+  "timezone": "",
+  "title": "Global eXperDB Overview",
+  "uid": "global-overview",
+  "version": 86,
+  "weekStart": ""
+}
